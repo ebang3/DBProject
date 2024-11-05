@@ -80,6 +80,8 @@ try:
     for economy in economy_data:
         print(economy)
 
+    ### EOC
+
 except Error as e:
     print("Error connecting to MySQL or executing SQL file:", e)
 
