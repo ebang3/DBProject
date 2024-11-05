@@ -12,22 +12,29 @@ password = os.getenv("MYSQL_PASSWORD")
 sql_file_path = "setup.sql"  # Make sure this path is correct
 
 try:
-    # Connect to MySQL
+    # Connect to MySQL without specifying a database
     conn = mysql.connector.connect(
         host="localhost",
         user=user,
-        password=password,
-        database="dbmap"
+        password=password
     )
     cursor = conn.cursor()
     print("Connected to MySQL database successfully")
 
+    # Create the database if it doesn't exist
+    database_name = "dbmap"
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database_name};")
+    print(f"Database '{database_name}' checked/created successfully")
+
+    # Now connect to the newly created or existing database
+    conn.database = database_name  # Set the database to use
+
     # Test the connection with a simple query
     cursor.execute("SELECT DATABASE();")
-    database_name = cursor.fetchone()
-    print("Connected to database:", database_name[0])
+    current_database = cursor.fetchone()
+    print("Connected to database:", current_database[0])
 
-    ### INSERTS DATA INTO DATABASE (COMMENT OUT AFTER INSERTING DATA)
+    ### INSERT DATA INTO DATABASE (UNCOMMENT AFTER INSERTING DATA)
 
     # Read and execute the SQL file
     with open(sql_file_path, 'r') as file:
@@ -41,7 +48,7 @@ try:
 
     print("SQL file executed successfully")
 
-    #######
+    ### EOC
 
     ### READ DATA FROM DATABASE (MAKE SURE TO HAVE INSERTED DATA BEFORE HAND)
 
