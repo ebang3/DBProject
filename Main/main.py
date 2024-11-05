@@ -1,75 +1,91 @@
 import os
-from pymongo import MongoClient
+import mysql.connector
+from mysql.connector import Error
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
+user = os.getenv("MONGO_USER")
 password = os.getenv("MONGO_PASSWORD")
-print("MongoDB password:", password)
-conn = f"mongodb+srv://admin:{password}@dbmap.cvnuy.mongodb.net/DBProject?retryWrites=true&w=majority"
-client = MongoClient(conn)
 
+# Path to the SQL file
+sql_file_path = "setup.sql"  # Make sure this path is correct
 
-# Test the connection
 try:
-    # Get a list of databases
-    databases = client.list_database_names()
-    print("Connected to MongoDB. Databases:", databases)
+    # Connect to MySQL
+    conn = mysql.connector.connect(
+        host="localhost",
+        user=user,
+        password=password,
+        database="dbmap"
+    )
+    cursor = conn.cursor()
+    print("Connected to MySQL database successfully")
 
-    # Select the database
-    db = client["DBMap"]  # Replace with your database name
-    print("Using database:", db.name)
+    # Test the connection with a simple query
+    cursor.execute("SELECT DATABASE();")
+    database_name = cursor.fetchone()
+    print("Connected to database:", database_name[0])
 
-    # You can also test collections
-    collections = db.list_collection_names()
-    print("Collections in the database:", collections)
+    ### INSERTS DATA INTO DATABASE (COMMENT OUT AFTER INSERTING DATA)
 
-except Exception as e:
-    print("Error connecting to MongoDB:", str(e))
+    # # Read and execute the SQL file
+    # with open(sql_file_path, 'r') as file:
+    #     sql_commands = file.read()
 
-# Testing data
-states_data = [
-    {"StateID": 1, "Name": "California", "Nickname": "Golden State", "Capital": "Sacramento", "Size": 163696, "RegionID": 1},
-    {"StateID": 2, "Name": "Texas", "Nickname": "Lone Star State", "Capital": "Austin", "Size": 268596, "RegionID": 2},
-    {"StateID": 3, "Name": "Florida", "Nickname": "Sunshine State", "Capital": "Tallahassee", "Size": 65758, "RegionID": 3}
-]
+    # # Split commands by semicolon and execute each one
+    # for command in sql_commands.split(';'):
+    #     if command.strip():  # Skip empty commands
+    #         cursor.execute(command)
+    #         conn.commit()  # Commit after each command if needed
 
-regions_data = [
-    {"RegionID": 1, "RegionName": "West", "StateCount": 13},
-    {"RegionID": 2, "RegionName": "South", "StateCount": 16},
-    {"RegionID": 3, "RegionName": "Southeast", "StateCount": 12}
-]
+    # print("SQL file executed successfully")
 
-demographic_data = [
-    {"DemographicID": 1, "StateID": 1, "TotalPopulation": 39538223, "AgeDistribution": {"0-18": 23.5, "19-34": 22.5, "35-54": 27, "55-74": 20, "75+": 7}, "MedianAge": 36.5, "UrbanizationRate": 95},
-    {"DemographicID": 2, "StateID": 2, "TotalPopulation": 29145505, "AgeDistribution": {"0-18": 25.2, "19-34": 20.4, "35-54": 28.2, "55-74": 19.2, "75+": 7}, "MedianAge": 35.5, "UrbanizationRate": 85},
-    {"DemographicID": 3, "StateID": 3, "TotalPopulation": 21538187, "AgeDistribution": {"0-18": 21.3, "19-34": 21.1, "35-54": 26.8, "55-74": 22.8, "75+": 8}, "MedianAge": 42, "UrbanizationRate": 91}
-]
+    #######
 
-diversity_data = [
-    {"DiversityID": 1, "StateID": 1, "RaceEthnicity": {"White": 39.4, "Hispanic": 39.3, "Black": 6.5, "Asian": 15.5, "Other": 2.3}},
-    {"DiversityID": 2, "StateID": 2, "RaceEthnicity": {"White": 41.2, "Hispanic": 40.2, "Black": 12.5, "Asian": 5, "Other": 1.1}},
-    {"DiversityID": 3, "StateID": 3, "RaceEthnicity": {"White": 53.3, "Hispanic": 26.3, "Black": 16, "Asian": 2.9, "Other": 1.5}}
-]
+    ### READ DATA FROM DATABASE (MAKE SURE TO HAVE INSERTED DATA BEFORE HAND)
 
-economy_data = [
-    {"EconomyID": 1, "StateID": 1, "GrossStateProduct": 3200000, "UnemploymentRate": 7.5, "MedianHouseholdIncome": 80000, "PovertyRate": 12, "MajorIndustries": ["Technology", "Agriculture", "Entertainment"]},
-    {"EconomyID": 2, "StateID": 2, "GrossStateProduct": 1800000, "UnemploymentRate": 6.7, "MedianHouseholdIncome": 64000, "PovertyRate": 14.5, "MajorIndustries": ["Energy", "Agriculture", "Manufacturing"]},
-    {"EconomyID": 3, "StateID": 3, "GrossStateProduct": 1100000, "UnemploymentRate": 5.9, "MedianHouseholdIncome": 58000, "PovertyRate": 13, "MajorIndustries": ["Tourism", "Agriculture", "Healthcare"]}
-]
+    # Example 1: Read data from 'states' table
+    cursor.execute("SELECT * FROM states;")
+    states = cursor.fetchall()
+    print("States:")
+    for state in states:
+        print(state)  # Each 'state' is a tuple of column values
 
-# Use this to delete all data
-# Delete old data from MongoDB
-collections = db.list_collection_names()
-for collection_name in collections:
-    collection = db[collection_name]
-    result = collection.delete_many({})
-    print("Data from", collection_name, "deleted")
+    # Example 2: Read data from 'regions' table
+    cursor.execute("SELECT * FROM regions;")
+    regions = cursor.fetchall()
+    print("\nRegions:")
+    for region in regions:
+        print(region)
 
-# Insert testing data into MongoDB
-db.State.insert_many(states_data)
-db.Region.insert_many(regions_data)
-db.Demographic.insert_many(demographic_data)
-db.Diversity.insert_many(diversity_data)
-db.Economy.insert_many(economy_data)
+    # Example 3: Read data from 'demographics' table
+    cursor.execute("SELECT * FROM demographics;")
+    demographics = cursor.fetchall()
+    print("\nDemographics:")
+    for demographic in demographics:
+        print(demographic)
 
-print("Testing Data inserted successfully!")
+    # Example 4: Read data from 'diversity' table
+    cursor.execute("SELECT * FROM diversity;")
+    diversity_data = cursor.fetchall()
+    print("\nDiversity:")
+    for diversity in diversity_data:
+        print(diversity)
+
+    # Example 5: Read data from 'economy' table
+    cursor.execute("SELECT * FROM economy;")
+    economy_data = cursor.fetchall()
+    print("\nEconomy:")
+    for economy in economy_data:
+        print(economy)
+
+except Error as e:
+    print("Error connecting to MySQL or executing SQL file:", e)
+
+finally:
+    # Close the connection
+    if conn.is_connected():
+        cursor.close()
+        conn.close()
+        print("MySQL connection is closed")
