@@ -1,10 +1,11 @@
 # To display the interactive map
-
+import os
 import geopandas as gpd
 import plotly.express as px
 
 # Load the shapefile for U.S. states (adjust path as necessary)
-gdf = gpd.read_file("./mapfiles/ne_10m_admin_1_states_provinces.shp")
+shapefile_path = os.path.join(os.path.dirname(os.getcwd()), "mapfiles", "ne_10m_admin_1_states_provinces.shp")
+gdf = gpd.read_file(shapefile_path)
 
 # Filter for U.S. states only
 us_states = gdf[gdf['iso_a2'] == 'US']
