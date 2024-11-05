@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-user = os.getenv("MONGO_USER")
-password = os.getenv("MONGO_PASSWORD")
+user = os.getenv("MYSQL_USER")
+password = os.getenv("MYSQL_PASSWORD")
 
 # Path to the SQL file
 sql_file_path = "setup.sql"  # Make sure this path is correct
