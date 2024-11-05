@@ -29,17 +29,17 @@ try:
 
     ### INSERTS DATA INTO DATABASE (COMMENT OUT AFTER INSERTING DATA)
 
-    # # Read and execute the SQL file
-    # with open(sql_file_path, 'r') as file:
-    #     sql_commands = file.read()
+    # Read and execute the SQL file
+    with open(sql_file_path, 'r') as file:
+        sql_commands = file.read()
 
-    # # Split commands by semicolon and execute each one
-    # for command in sql_commands.split(';'):
-    #     if command.strip():  # Skip empty commands
-    #         cursor.execute(command)
-    #         conn.commit()  # Commit after each command if needed
+    # Split commands by semicolon and execute each one
+    for command in sql_commands.split(';'):
+        if command.strip():  # Skip empty commands
+            cursor.execute(command)
+            conn.commit()  # Commit after each command if needed
 
-    # print("SQL file executed successfully")
+    print("SQL file executed successfully")
 
     #######
 
