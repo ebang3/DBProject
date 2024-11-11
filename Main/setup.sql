@@ -1,3 +1,11 @@
+-- Create Password --
+CREATE USER 'root'@'localhost' IDENTIFIED BY 'your_password_here';
+--FYI not of these fucking work fuck SQL fuck this class -- 
+CREATE USER 'MYSQL_USER'@'localhost' IDENTIFIED BY 'MYSQL_PASSWORD';
+GRANT ALL PRIVILEGES ON *.* TO 'MYSQL_USER'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
 -- Create the 'states' table
 CREATE TABLE IF NOT EXISTS states (
     StateID INT PRIMARY KEY,
