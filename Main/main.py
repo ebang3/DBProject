@@ -1,7 +1,7 @@
 import os
 import mysql.connector
 from mysql.connector import Error
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 
 # Load environment variables
 load_dotenv()
@@ -10,6 +10,11 @@ password = os.getenv("MYSQL_PASSWORD")
 
 # Path to the SQL file
 sql_file_path = "setup.sql"  # Make sure this path is correct
+
+# Ensure user and password are provided
+if not user or not password:
+    print("MySQL credentials not found in environment variables.")
+    exit(1)
 
 try:
     # Connect to MySQL without specifying a database
@@ -91,8 +96,8 @@ except Error as e:
     print("Error connecting to MySQL or executing SQL file:", e)
 
 finally:
-    # Close the connection
-    if conn.is_connected():
+    # Close the connection if it's defined
+    if 'conn' in locals() and conn.is_connected():
         cursor.close()
         conn.close()
         print("MySQL connection is closed")
