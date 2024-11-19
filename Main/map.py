@@ -1,16 +1,17 @@
-# To display the interactive map
-
 import geopandas as gpd
 import plotly.express as px
 
 # Load the shapefile for U.S. states (adjust path as necessary)
-gdf = gpd.read_file("./mapfiles/ne_10m_admin_1_states_provinces.shp")
+gdf = gpd.read_file("../mapfiles/ne_10m_admin_1_states_provinces.shp")
 
 # Filter for U.S. states only
 us_states = gdf[gdf['iso_a2'] == 'US']
 
 # Reproject to make compatible with Plotly's maps
 us_states = us_states.to_crs("EPSG:4326")
+
+# Add a custom column for the hover text you want
+us_states['hover_text'] = us_states['name'] + ""  # Customize this line as needed
 
 # Create the Plotly figure
 fig = px.choropleth(
@@ -30,25 +31,20 @@ fig.update_geos(
     subunitcolor="Gray",
 )
 
-# Update layout for interactivity
+# Update layout for interactivity and custom hover
 fig.update_traces(
-    marker_line_width=2,  # Default thickness of state borders
-    marker_line_color='brown',  # Default fill color
-    hovertemplate="<b>%{hovertext}</b><extra></extra>",  # Custom hover text
-)
-
-# Highlight the border of the state on hover
-fig.update_traces(
-    hoverinfo='text',
-    text=us_states['name'],  # Show the name of the state on hover
-    marker=dict(line=dict(width=2)),  # Default border width
+    # marker_line_width=2,  # Default thickness of state borders
+    # marker_line_color='brown',  # Default border color
+    hovertemplate="<b>%{customdata}</b><br>Peach State<extra></extra>",  # Custom hover text with "Peach State"
+    customdata=us_states['hover_text'],  # Custom data for hover text
 )
 
 # Add a callback for hover effect to change border thickness
 fig.update_traces(
     marker=dict(line=dict(color='blue', width=3)),  # Change border color and width on hover
 )
-  # thicker borders for states
+
+# Additional layout settings
 fig.update_layout(
     hovermode="closest",
     geo=dict(
