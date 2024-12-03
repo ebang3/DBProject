@@ -9,7 +9,7 @@ user = os.getenv("MYSQL_USER")
 password = os.getenv("MYSQL_PASSWORD")
 
 # Path to the SQL file
-sql_file_path = "setup.sql"  # Make sure this path is correct
+sql_file_path = "./Main/setup.sql"  # Make sure this path is correct
 
 try:
     # Connect to MySQL without specifying a database
