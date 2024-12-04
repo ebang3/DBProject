@@ -1,6 +1,7 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template
 import geopandas as gpd
 import plotly.express as px
+import plotly.graph_objects as go
 
 app = Flask(__name__)
 
@@ -13,11 +14,11 @@ us_states = gdf[gdf['iso_a2'] == 'US']
 # Reproject to make compatible with Plotly's maps
 us_states = us_states.to_crs("EPSG:4326")
 
-# Add a custom column for hover text
-us_states['hover_text'] = us_states['name']
+# Add a custom column for the hover text you want
+us_states['hover_text'] = us_states['name']  # Customize this line as needed
 
-# Convert geometries to GeoJSON format
-geojson = us_states.geometry.__geo_interface__
+# Convert geometries to geojson format
+geojson = us_states.geometry.__geo_interface__  # Convert to proper GeoJSON format
 
 @app.route('/')
 def index():
@@ -32,39 +33,54 @@ def index():
 
     # Set the geo properties to display the map properly
     fig.update_geos(
-        visible=True,  # Make the map visible
+        visible=False,
         showcountries=True,
         countrycolor="Black",
         showsubunits=True,
         subunitcolor="Gray",
     )
 
-    # Prepare the map for rendering
+    # Add JavaScript for handling the click event and redirect
     fig.update_layout(
-        hovermode="closest",
         geo=dict(
             scope="usa",
             projection_type="albers usa",
-        )
+        ),
+        hovermode="closest",
+        # Add JavaScript for the redirection logic
+        updatemenus=[dict(
+            type='buttons', 
+            showactive=False, 
+            buttons=[dict(
+                label="Click a state",
+                method="relayout",
+                args=[{"mapbox.center": {"lat": 37.0902, "lon": -95.7129}}]  # Adjust this to center the map
+            )]
+        )],
+        # Include the custom click handling via JavaScript
+        annotations=[
+            dict(
+                x=0.5,
+                y=0.5,
+                showarrow=False,
+                text="Click a state to get details!",
+                font=dict(size=15, color="black"),
+                align="center"
+            )
+        ],
+        # Embed Plotly chart as an HTML div
+        plot_bgcolor="white"
     )
 
-    # Plotly figure HTML representation
-    graph_html = fig.to_html(full_html=False)
+    # Include a JavaScript script for redirection on click
+    plot_div = fig.to_html(full_html=False, include_plotlyjs='cdn')
+    
+    return render_template('index.html', plot_div=plot_div)
 
+@app.route('/state/<state_name>')
+def state_page(state_name):
+    # Return a simple page for the clicked state
+    return render_template('state_page.html', state_name=state_name)
 
-    # Render the HTML template and pass graph_html
-    return render_template('index.html', graph_html=graph_html)
-
-@app.route('/state/<state_id>')
-def state_info(state_id):
-    # Retrieve the state name based on the clicked state ID (index)
-    try:
-        clicked_state = us_states.iloc[int(state_id)]  # Convert state_id to index
-        state_name = clicked_state['name']
-        # Respond with a JSON object containing the state name
-        return jsonify({"message": f"State clicked: {state_name}"})
-    except IndexError:
-        return jsonify({"error": "Invalid state clicked"}), 400
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

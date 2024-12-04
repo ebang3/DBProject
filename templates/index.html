@@ -3,11 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Plotly Map</title>
+    <title>Interactive Map of U.S. States</title>
+    <!-- Ensure Plotly is included -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <h1>Interactive Map of U.S. States</h1>
-    <!-- This is where the Plotly map will be embedded -->
-    {{ graph_html|safe }}
+    <div id="plotly-graph">
+        {{ plot_div|safe }}
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Check if Plotly is available
+            if (typeof Plotly !== 'undefined') {
+                console.log('Plotly is loaded');
+
+                // Get the plotly graph container element
+                var plotDiv = document.getElementById('plotly-graph');
+
+                // Ensure the chart is rendered and the div is found
+                if (plotDiv) {
+                    console.log("Plotly chart found:", plotDiv);
+
+                    // Access the actual Plotly chart element inside the div
+                    var plotlyGraph = plotDiv.querySelector('.plotly-graph-div');
+
+                    // Ensure the Plotly graph is ready
+                    if (plotlyGraph) {
+                        console.log("Plotly chart is ready:", plotlyGraph);
+
+                        // Now we can safely add the event listener
+                        plotlyGraph.on('plotly_click', function(eventData) {
+                            console.log("Clicked data:", eventData);
+
+                            // Get the clicked state's name from the hovertext
+                            var clickedState = eventData.points[0].hovertext;
+
+                            if (clickedState) {
+                                console.log("Clicked state:", clickedState);
+
+                                // Format the state name for the URL (replace spaces with underscores)
+                                var stateName = clickedState.replace(' ', '_');
+
+                                // Redirect to the Flask route for that state
+                                window.location.href = "/state/" + stateName;  // Redirect to /state/{state_name}
+                            } else {
+                                console.error("No hovertext found!");
+                            }
+                        });
+                    } else {
+                        console.error("Plotly graph is not rendered properly.");
+                    }
+                } else {
+                    console.error("Plotly graph container not found!");
+                }
+            } else {
+                console.error("Plotly is not loaded.");
+            }
+        };
+    </script>
 </body>
 </html>
