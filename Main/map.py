@@ -1,5 +1,9 @@
 import geopandas as gpd
 import plotly.express as px
+import plotly.graph_objects as go
+
+
+
 
 # Load the shapefile for U.S. states (adjust path as necessary)
 gdf = gpd.read_file("../mapfiles/ne_10m_admin_1_states_provinces.shp")
@@ -13,10 +17,13 @@ us_states = us_states.to_crs("EPSG:4326")
 # Add a custom column for the hover text you want
 us_states['hover_text'] = us_states['name'] + ""  # Customize this line as needed
 
+# Convert geometries to geojson format
+geojson = us_states.geometry.__geo_interface__  # Convert to proper GeoJSON format
+
 # Create the Plotly figure
 fig = px.choropleth(
     data_frame=us_states,
-    geojson=us_states.geometry, 
+    geojson=geojson, 
     locations=us_states.index,
     hover_name="name",  
     title="Interactive Map of U.S. States"
@@ -30,6 +37,25 @@ fig.update_geos(
     showsubunits=True,
     subunitcolor="Gray",
 )
+
+# **(1) Define a function to handle click events and redirect**
+def handle_click(trace, points, selector):
+    if points.point_inds:
+        # **(2) Get the clicked state's name**
+        clicked_state = us_states.iloc[points.point_inds[0]]['name']
+        print(f"State clicked: {clicked_state}")
+        
+        # **(3) Construct the URL for redirection**
+        # Redirect to a state-specific page (e.g., "/state/{state_name}")
+        redirect_url = f"/state/{clicked_state.replace(' ', '_')}"
+        
+        # **(4) Simulate a redirection (or use in web frameworks)**
+        print(f"Redirecting to: {redirect_url}")
+        # In a web framework like Flask, you could redirect like this:
+        # return redirect(redirect_url)
+
+# **(5) Add the click callback to the figure**
+fig.data[0].on_click(handle_click)
 
 # Update layout for interactivity and custom hover
 fig.update_traces(
