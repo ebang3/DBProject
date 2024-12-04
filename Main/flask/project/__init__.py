@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
+from flask_migrate import Migrate
 import logging
 import os
 from dotenv import load_dotenv
@@ -10,6 +11,8 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
+    migrate = Migrate(app,db)
+
 
     load_dotenv()
 
