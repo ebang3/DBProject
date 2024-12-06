@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All U.S. States - Data Table</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>All U.S. States - Data Table</h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <a href="{{ url_for('index') }}">Back to Map</a>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Total Population</th>
+                            <th>Median Age</th>
+                            <th>Age Distribution</th>
+                            <th>Urbanization Rate</th>
+                            <th>Race/Ethnicity</th>
+                            <th>Gross State Product</th>
+                            <th>Median Household Income</th>
+                            <th>Unemployment Rate</th>
+                            <th>Poverty Rate</th>
+                            <th>Major Industries</th>
+                            <th>Region</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for state in state_data %}
+                        <tr>
+                            <td>{{ state.name }}</td>
+                            <td>{{ state.total_population | format_number }}</td>
+                            <td>{{ state.median_age }}</td>
+                            <td>{{ state.age_distribution if state.age_distribution else 'N/A' }}</td>
+                            <td>{{ state.urbanization_rate if state.urbanization_rate else 'N/A' }}</td>
+                            <td>{{ state.race_ethnicity if state.race_ethnicity else 'N/A' }}</td>
+                            <td>{{ state.gsp | format_number if state.gsp else 'N/A' }}</td>
+                            <td>{{ state.median_household_income | format_number if state.median_household_income else
+                                'N/A' }}</td>
+                            <td>{{ state.unemployment_rate if state.unemployment_rate else 'N/A' }}</td>
+                            <td>{{ state.poverty_rate if state.poverty_rate else 'N/A' }}</td>
+                            <td>{{ state.major_industries if state.major_industries else 'N/A' }}</td>
+                            <td>{{ state.region_name if state.region_name else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Interactive U.S. State Data Table. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='script.css') }}">
+{% endblock %}

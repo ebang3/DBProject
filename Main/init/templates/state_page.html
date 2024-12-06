@@ -5,62 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ state_data.state_name }} Details</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        header h1 {
-            margin: 0;
-        }
-        main {
-            padding: 20px;
-        }
-        a {
-            color: #0044cc;
-            text-decoration: none;
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px;
-            background-color: #e6f7ff;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        a:hover {
-            background-color: #b3e0ff;
-        }
-        section {
-            margin-bottom: 30px;
-        }
-        section h2 {
-            color: #0044cc;
-            border-bottom: 2px solid #0044cc;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        ul li {
-            margin-bottom: 10px;
-        }
-        ul li span {
-            font-weight: bold;
-        }
-        .data-list {
-            margin-left: 20px;
-        }
-    </style>
 </head>
 
 <body>
@@ -122,3 +66,7 @@
     </main>
 </body>
 </html>
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='script.css') }}">
+{% endblock %}

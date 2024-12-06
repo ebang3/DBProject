@@ -54,16 +54,6 @@ def index():
             projection_type="albers usa",
         ),
         hovermode="closest",
-        # Add JavaScript for the redirection logic
-        updatemenus=[dict(
-            type='buttons', 
-            showactive=False, 
-            buttons=[dict(
-                label="Click a state",
-                method="relayout",
-                args=[{"mapbox.center": {"lat": 37.0902, "lon": -95.7129}}]  # Adjust this to center the map
-            )]
-        )],
         # Include the custom click handling via JavaScript
         annotations=[
             dict(
@@ -133,6 +123,49 @@ def state_page(state_name):
 
     # Render the state-specific page with the queried data
     return render_template('state_page.html', state_data=state_data)
+
+@app.route('/states')
+def states_table():
+    # Query the data for all states
+    states_data = db.session.query(
+        States.Name,
+        Demographics.TotalPopulation,
+        Demographics.MedianAge,
+        Demographics.AgeDistribution,
+        Demographics.UrbanizatonRate,
+        Diversity.RaceEthnicity,
+        Economy.GrossStateProduct,
+        Economy.MedianHouseholdIncome,
+        Economy.UnemploymentRate,
+        Economy.PovertyRate,
+        Economy.MajorIndustries,
+        Regions.RegionName
+    ).join(Demographics, Demographics.StateID == States.StateID) \
+     .join(Diversity, Diversity.StateID == States.StateID) \
+     .join(Economy, Economy.StateID == States.StateID) \
+     .join(Regions, States.RegionID == Regions.RegionID) \
+     .all()
+
+    # Prepare the data for the template
+    state_data = []
+    for row in states_data:
+        state_data.append({
+            'name': row.Name,
+            'total_population': row.TotalPopulation,
+            'median_age': row.MedianAge,
+            'age_distribution': row.AgeDistribution,
+            'urbanization_rate': row.UrbanizatonRate,
+            'race_ethnicity': row.RaceEthnicity,
+            'gsp': row.GrossStateProduct,
+            'median_household_income': row.MedianHouseholdIncome,
+            'unemployment_rate': row.UnemploymentRate,
+            'poverty_rate': row.PovertyRate,
+            'major_industries': row.MajorIndustries,
+            'region_name': row.RegionName,
+        })
+
+    # Render the states table page with the queried data
+    return render_template('states_table.html', state_data=state_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
