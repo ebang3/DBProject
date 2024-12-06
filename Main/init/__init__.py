@@ -1,18 +1,15 @@
 from flask import Flask, request, jsonify, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 import logging
 import os
 from dotenv import load_dotenv
 
 db = SQLAlchemy()
-login_manager = LoginManager()
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
     migrate = Migrate(app,db)
-
 
     load_dotenv()
 
@@ -31,4 +28,4 @@ def create_app():
 
         db.create_all()
 
-        return app
+    return app

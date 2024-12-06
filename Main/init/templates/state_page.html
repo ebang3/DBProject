@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ state_data.state_name }} Details</title>
+</head>
+
+<body>
+    <h1>Details for {{ state_data.state_name }}</h1>
+
+    <h2>Demographics</h2>
+    <ul>
+        {% for demographic in state_data.demographics %}
+        <li>Total Population: {{ demographic.total_population }}</li>
+        <li>Age Distribution: {{ demographic.age_distribution }}</li>
+        <li>Median Age: {{ demographic.median_age }}</li>
+        <li>Urbanization Rate: {{ demographic.urbanization_rate }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Diversity</h2>
+    <ul>
+        {% for diversity in state_data.diversity %}
+        <li>Race/Ethnicity: {{ diversity.race_ethnicity }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Economy</h2>
+    <ul>
+        {% for econ in state_data.economy %}
+        <li>Gross State Product: {{ econ.gsp }}</li>
+        <li>Unemployment Rate: {{ econ.unemployment_rate }}</li>
+        <li>Median Household Income: {{ econ.median_household_income }}</li>
+        <li>Poverty Rate: {{ econ.poverty_rate }}</li>
+        <li>Major Industries: {{ econ.major_industries }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Region</h2>
+    <ul>
+        {% for region in state_data.regions %}
+        <li>Region Name: {{ region.region_name }}</li>
+        <li>State Count: {{ region.state_count }}</li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>

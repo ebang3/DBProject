@@ -1,12 +1,15 @@
-from flask import Flask, render_template
+from flask import Flask, request, jsonify, url_for, redirect, render_template
+from init import create_app
+from init.models import Demographics, Diversity, Economy, Regions, States
+from init import db
 import geopandas as gpd
 import plotly.express as px
 import plotly.graph_objects as go
 
-app = Flask(__name__)
+app = create_app()
 
 # Load the shapefile for U.S. states (adjust path as necessary)
-gdf = gpd.read_file("../mapfiles/ne_10m_admin_1_states_provinces.shp")
+gdf = gpd.read_file("./mapfiles/ne_10m_admin_1_states_provinces.shp")
 
 # Filter for U.S. states only
 us_states = gdf[gdf['iso_a2'] == 'US']
@@ -22,6 +25,7 @@ geojson = us_states.geometry.__geo_interface__  # Convert to proper GeoJSON form
 
 @app.route('/')
 def index():
+
     # Create the Plotly figure
     fig = px.choropleth(
         data_frame=us_states,
@@ -79,8 +83,55 @@ def index():
 
 @app.route('/state/<state_name>')
 def state_page(state_name):
-    # Return a simple page for the clicked state
-    return render_template('state_page.html', state_name=state_name)
+    # Query the data for the selected state
+    data = db.session.query(
+        Demographics,
+        Diversity,
+        Economy,
+        Regions,
+        States
+    ).join(States, Demographics.StateID == States.StateID) \
+     .join(Diversity, Diversity.StateID == States.StateID) \
+     .join(Economy, Economy.StateID == States.StateID) \
+     .join(Regions, States.RegionID == Regions.RegionID) \
+     .filter(States.Name == state_name) \
+     .all()  # Filter to match the selected state
+
+    # Process data for the selected state
+    state_data = {
+        'state_name': state_name,
+        'demographics': [],
+        'diversity': [],
+        'economy': [],
+        'regions': [],
+    }
+
+    for row in data:
+        # Append data for the state
+        state_data['demographics'].append({
+            'total_population': row.Demographics.TotalPopulation,
+            'age_distribution': row.Demographics.AgeDistribution,
+            'median_age': row.Demographics.MedianAge,
+            'urbanization_rate': row.Demographics.UrbanizatonRate,
+        })
+        state_data['diversity'].append({
+            'race_ethnicity': row.Diversity.RaceEthnicity,
+        })
+        state_data['economy'].append({
+            'gsp': row.Economy.GrossStateProduct,
+            'unemployment_rate': row.Economy.UnemploymentRate,
+            'median_household_income': row.Economy.MedianHouseholdIncome,
+            'poverty_rate': row.Economy.PovertyRate,
+            'major_industries': row.Economy.MajorIndustries,
+        })
+        state_data['regions'].append({
+            'region_name': row.Regions.RegionName,
+            'state_count': row.Regions.StateCount,
+        })
+
+    # Render the state-specific page with the queried data
+    return render_template('state_page.html', state_data=state_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
