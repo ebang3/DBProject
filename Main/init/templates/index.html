@@ -1,20 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map of U.S. States</title>
     <!-- Ensure Plotly is included -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background-color: #0044cc;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        #plotly-graph {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .intro-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Make sure the Plotly chart is responsive */
+        .plotly-graph-div {
+            width: 100%;
+            height: 80vh;
+            /* Adjust to make the map take up most of the screen */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            background-color: #0044cc;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            .intro-text {
+                font-size: 1em;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Interactive Map of U.S. States</h1>
-    <div id="plotly-graph">
-        {{ plot_div|safe }}
-    </div>
+    <header>
+        <h1>Interactive Map of U.S. States</h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <p class="intro-text">
+                Click on any state in the map to view detailed demographic, economic, and geographic information.
+            </p>
+            <div id="plotly-graph">
+                {{ plot_div|safe }}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Interactive U.S. State Map. All rights reserved.</p>
+    </footer>
 
     <script>
-        window.onload = function() {
+        window.onload = function () {
             // Check if Plotly is available
             if (typeof Plotly !== 'undefined') {
                 console.log('Plotly is loaded');
@@ -34,7 +118,7 @@
                         console.log("Plotly chart is ready:", plotlyGraph);
 
                         // Now we can safely add the event listener
-                        plotlyGraph.on('plotly_click', function(eventData) {
+                        plotlyGraph.on('plotly_click', function (eventData) {
                             console.log("Clicked data:", eventData);
 
                             // Get the clicked state's name from the hovertext
@@ -43,8 +127,8 @@
                             if (clickedState) {
                                 console.log("Clicked state:", clickedState);
 
-                                // Format the state name for the URL (replace spaces with underscores)
-                                var stateName = clickedState.replace(' ', '_');
+                                // Encode the state name for the URL (replace spaces with %20)
+                                var stateName = encodeURIComponent(clickedState);
 
                                 // Redirect to the Flask route for that state
                                 window.location.href = "/state/" + stateName;  // Redirect to /state/{state_name}
@@ -63,5 +147,7 @@
             }
         };
     </script>
+
 </body>
+
 </html>

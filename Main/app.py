@@ -23,9 +23,14 @@ us_states['hover_text'] = us_states['name']  # Customize this line as needed
 # Convert geometries to geojson format
 geojson = us_states.geometry.__geo_interface__  # Convert to proper GeoJSON format
 
+@app.template_filter('format_number')
+def format_number(value):
+    if isinstance(value, (int, float)):
+        return "{:,}".format(value)
+    return value
+
 @app.route('/')
 def index():
-
     # Create the Plotly figure
     fig = px.choropleth(
         data_frame=us_states,
@@ -34,7 +39,6 @@ def index():
         hover_name="name",  
         title="Interactive Map of U.S. States"
     )
-
     # Set the geo properties to display the map properly
     fig.update_geos(
         visible=False,
@@ -43,7 +47,6 @@ def index():
         showsubunits=True,
         subunitcolor="Gray",
     )
-
     # Add JavaScript for handling the click event and redirect
     fig.update_layout(
         geo=dict(
@@ -75,7 +78,6 @@ def index():
         # Embed Plotly chart as an HTML div
         plot_bgcolor="white"
     )
-
     # Include a JavaScript script for redirection on click
     plot_div = fig.to_html(full_html=False, include_plotlyjs='cdn')
     
